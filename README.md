@@ -1,5 +1,5 @@
 [![HuskBungeeRTP Banner](images/banner-graphic.png)](https://github.com/WiIIiam278/HuskBungeeRTP)
-# HuskSync
+# HuskBungeeRTP
 [![Discord](https://img.shields.io/discord/818135932103557162?color=7289da&logo=discord)](https://discord.gg/tVYhJfyDWG)
 
 **HuskBungeeRTP** is a cross-server random teleport plugin that utilises [HuskHomes](https://github.com/WiIIiam278/HuskHomes), Redis and MySQL to allow players to randomly teleport to Spigot servers on a proxy network.
