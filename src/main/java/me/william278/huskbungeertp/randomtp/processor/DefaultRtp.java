@@ -42,6 +42,12 @@ public class DefaultRtp extends AbstractRtp {
                 }
             }
             if (isLocationValid) {
+                if (world.getEnvironment().equals(World.Environment.NETHER)) {
+                    Block block = world.getBlockAt(randomLocation);
+                    block.setType(Material.AIR);
+                    Block top = world.getBlockAt(randomLocation.getBlockX(), randomLocation.getBlockY() + 1, randomLocation.getBlockZ());
+                    top.setType(Material.AIR);
+                }
                 return new RandomResult(randomLocation, true, attempts);
             }
         }
@@ -72,15 +78,25 @@ public class DefaultRtp extends AbstractRtp {
             x *= -1;
             blockCenterX *= -1;
         }
-        if (random.nextBoolean())  {
+        if (random.nextBoolean()) {
             z *= -1;
             blockCenterZ *= -1;
         }
 
         // Put together random location, get the highest block plus one to determine Y
         Location randomLocation = new Location(world, (x + blockCenterX), y, (z + blockCenterZ));
-        y = world.getHighestBlockYAt(randomLocation) + 1;
-        randomLocation.setY(y);
+        if (world.getEnvironment().equals(World.Environment.NETHER)) {
+            boolean safe = false;
+            for (int i = 0; i < HuskBungeeRTP.getSettings().getMaxRtpAttempts(); i++) {
+                if (safe) break;
+                int random_y = random.nextInt((120 - 2) + 1) + 2;
+                randomLocation.setY(random_y);
+                safe = isLocationSafe(randomLocation);
+            }
+        } else {
+            y = world.getHighestBlockYAt(randomLocation) + 1;
+            randomLocation.setY(y);
+        }
 
         return randomLocation;
     }
@@ -104,6 +120,10 @@ public class DefaultRtp extends AbstractRtp {
             Block block = world.getBlockAt(x, y, z);
             Block below = world.getBlockAt(x, y - 1, z);
             Block above = world.getBlockAt(x, y + 1, z);
+
+            if (world.getEnvironment().equals(World.Environment.NETHER)) {
+                if (y >= 127) return false;
+            }
 
             // Check to see if those blocks are safe to teleport to
             if (!UNSAFE_BLOCKS.contains(block.getType()) && block.getType().isSolid()) {

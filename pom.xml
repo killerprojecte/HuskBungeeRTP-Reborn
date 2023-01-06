@@ -40,7 +40,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>com.github.WiIIiam278</groupId>
             <artifactId>HuskHomes2</artifactId>
-            <version>2.8.2</version>
+            <version>3.2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -130,7 +130,8 @@
             <groupId>biz.donvi</groupId>
             <artifactId>JakesRTP</artifactId>
             <version>0.14.8</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/JakesRTP-v0.14.9.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>

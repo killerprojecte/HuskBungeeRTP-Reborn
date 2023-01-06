@@ -2,7 +2,9 @@ package me.william278.huskbungeertp.mysql;
 
 import me.william278.huskbungeertp.HuskBungeeRTP;
 import me.william278.huskbungeertp.config.Group;
-import me.william278.huskhomes2.teleport.points.TeleportationPoint;
+import net.william278.huskhomes.position.Position;
+import net.william278.huskhomes.position.Server;
+import net.william278.huskhomes.position.World;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -88,20 +90,21 @@ public class DataHandler {
     /*
         Not thread safe, perform inside a RunTaskAsynchronously!
      */
-    public static TeleportationPoint getPlayerLastRtpPosition(UUID uuid, Group group) {
-        TeleportationPoint point = null;
+    public static Position getPlayerLastRtpPosition(UUID uuid, Group group) {
+        Position point = null;
         try (Connection connection = getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(
                     "SELECT * FROM " + group.getGroupDatabaseTableName() + " WHERE `player_id`=(SELECT `id` FROM " + HuskBungeeRTP.getSettings().getDatabasePlayerTableName() + " WHERE `user_uuid`=? LIMIT 1) LIMIT 1;")) {
                 statement.setString(1, uuid.toString());
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
-                    point = new TeleportationPoint(resultSet.getString("dest_world"),
+                    point = new Position(
                             resultSet.getDouble("dest_x"),
                             resultSet.getDouble("dest_y"),
                             resultSet.getDouble("dest_z"),
                             0F, 0F,
-                            resultSet.getString("dest_server"));
+                            new World(resultSet.getString("dest_world"), UUID.randomUUID()),
+                            new Server(resultSet.getString("dest_server")));
                 }
             }
         } catch (SQLException e) {
@@ -110,7 +113,7 @@ public class DataHandler {
         return point;
     }
 
-    public static void setPlayerOnCoolDown(UUID uuid, Group group, TeleportationPoint point) {
+    public static void setPlayerOnCoolDown(UUID uuid, Group group, Position point) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try (Connection connection = getConnection()) {
                 try (PreparedStatement isPlayerNotAlreadySetCheck = connection.prepareStatement(
@@ -127,11 +130,11 @@ public class DataHandler {
                                 try (PreparedStatement preparedStatement = connection.prepareStatement(
                                         "INSERT INTO " + group.getGroupDatabaseTableName() + " (`player_id`,`dest_world`,`dest_x`,`dest_y`,`dest_z`,`dest_server`) VALUES(?,?,?,?,?,?);")) {
                                     preparedStatement.setInt(1, playerId);
-                                    preparedStatement.setString(2, point.getWorldName());
-                                    preparedStatement.setDouble(3, point.getX());
-                                    preparedStatement.setDouble(4, point.getY());
-                                    preparedStatement.setDouble(5, point.getZ());
-                                    preparedStatement.setString(6, point.getServer());
+                                    preparedStatement.setString(2, point.world.name);
+                                    preparedStatement.setDouble(3, point.x);
+                                    preparedStatement.setDouble(4, point.y);
+                                    preparedStatement.setDouble(5, point.z);
+                                    preparedStatement.setString(6, point.server.name);
                                     preparedStatement.executeUpdate();
                                 }
                             }

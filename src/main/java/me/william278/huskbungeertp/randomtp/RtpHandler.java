@@ -9,7 +9,9 @@ import me.william278.huskbungeertp.jedis.RedisMessenger;
 import me.william278.huskbungeertp.mysql.DataHandler;
 import me.william278.huskbungeertp.plan.PlanDataManager;
 import me.william278.huskbungeertp.randomtp.processor.AbstractRtp;
-import me.william278.huskhomes2.teleport.points.TeleportationPoint;
+import net.william278.huskhomes.api.HuskHomesAPI;
+import net.william278.huskhomes.position.Position;
+import net.william278.huskhomes.position.Server;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -75,7 +77,7 @@ public class RtpHandler {
             final DataHandler.CoolDownResponse coolDownResponse = DataHandler.getPlayerCoolDown(player.getUniqueId(), profile.getDestinationGroup());
             if (coolDownResponse.isInCoolDown() && !canBypassCoolDown) {
                 if (HuskBungeeRTP.getSettings().isUseLastRtpLocationOnCoolDown()) {
-                    TeleportationPoint lastRtpPosition = DataHandler.getPlayerLastRtpPosition(uuid, profile.getDestinationGroup());
+                    Position lastRtpPosition = DataHandler.getPlayerLastRtpPosition(uuid, profile.getDestinationGroup());
                     if (lastRtpPosition != null) {
                         if (coolDownResponse.timeLeft() <= 60) {
                             MessageManager.sendMessage(player, "last_rtp_cooldown_seconds", Long.toString(coolDownResponse.timeLeft()));
@@ -117,7 +119,7 @@ public class RtpHandler {
                         removeRtpUser(uuid);
                         return;
                     }
-                    final TeleportationPoint targetPoint = new TeleportationPoint(result.location(), targetServer.getName());
+                    final Position targetPoint = new Position(HuskHomesAPI.getInstance().adaptLocation(result.location()), new Server(targetServer.getName()));
                     HuskHomesExecutor.teleportPlayer(player, targetPoint);
                     removeRtpUser(uuid);
 

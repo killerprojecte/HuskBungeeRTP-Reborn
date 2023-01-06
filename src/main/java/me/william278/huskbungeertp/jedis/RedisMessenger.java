@@ -6,7 +6,9 @@ import me.william278.huskbungeertp.MessageManager;
 import me.william278.huskbungeertp.mysql.DataHandler;
 import me.william278.huskbungeertp.randomtp.RtpHandler;
 import me.william278.huskbungeertp.randomtp.processor.AbstractRtp;
-import me.william278.huskhomes2.teleport.points.TeleportationPoint;
+import net.william278.huskhomes.HuskHomes;
+import net.william278.huskhomes.position.Position;
+import net.william278.huskhomes.position.Server;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -101,14 +103,17 @@ public class RedisMessenger {
 
                 Player player = Bukkit.getPlayer(originPlayerUUID);
                 if (player != null) {
-                    HuskHomesExecutor.teleportPlayer(player, new TeleportationPoint(
-                            locationWorld, locationX, locationY, locationZ, 0F, 0F, sourceServer));
+                    //locationWorld, locationX, locationY, locationZ, 0F, 0F, sourceServer
+                    Position position = new Position(locationX, locationY, locationZ, 0f, 0f,
+                            new net.william278.huskhomes.position.World(locationWorld, UUID.randomUUID()), new Server(sourceServer));
+                    HuskHomesExecutor.teleportPlayer(player, position);
 
                     // Apply cool down
                     if (!player.hasPermission("huskrtp.bypass_cooldown")) {
                         DataHandler.setPlayerOnCoolDown(originPlayerUUID, HuskBungeeRTP.getSettings().getGroupById(destinationGroupId),
-                                new TeleportationPoint(locationWorld, locationX, locationY, locationZ, 0F, 0F, sourceServer));
+                                position);
                     }
+                    HuskHomes huskHomes = (HuskHomes) Bukkit.getPluginManager().getPlugin("HuskHomes");
                 }
                 RtpHandler.removeRtpUser(originPlayerUUID);
 
